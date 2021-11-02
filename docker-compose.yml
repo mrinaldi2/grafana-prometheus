@@ -1,0 +1,41 @@
+version: '3'
+services:
+ prometheus:
+   image: prom/prometheus
+   container_name: prometheus
+   volumes:
+     - /Users/manuel/Documents/aeterium/localenv/prometheus/data:/prometheus
+     - /Users/manuel/Documents/aeterium/localenv/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+   ports:
+     - 9090:9090
+ grafana:
+   image: grafana/grafana
+   container_name: grafana
+   volumes:
+     - /Users/manuel/Documents/aeterium/localenv/grafana/data:/var/lib/grafana
+     - /Users/manuel/Documents/aeterium/localenv/grafana/logs:/var/log/grafana
+     - /Users/manuel/Documents/aeterium/localenv/grafana/provisioning:/etc/grafana/provisioning
+   ports:
+     - 3000:3000
+   env_file:
+     - /Users/manuel/Documents/aeterium/localenv/grafana/grafana.env
+ mongodb:
+   image : mongo:4.0.23
+   container_name: mongodb
+   environment:
+     - PUID=1000
+     - PGID=1000
+   volumes:
+     - /Users/manuel/Documents/aeterium/localenv/mongodb/data:/data/db
+   ports:
+     - 27017:27017
+   restart: unless-stopped
+ spring:
+    depends_on:
+      - mongodb
+    container_name: spring
+    build: spring/.
+    env_file:
+      - /Users/manuel/Documents/aeterium/localenv/spring/spring.env
+    ports:
+      - 8080:8080
